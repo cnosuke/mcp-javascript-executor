@@ -42,6 +42,8 @@ func RunHTTP(cfg *config.Config, name string, version string, revision string) e
 		Addr:              cfg.HTTP.Binding,
 		Handler:           mux,
 		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

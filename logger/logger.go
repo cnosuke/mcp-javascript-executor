@@ -24,7 +24,7 @@ func InitLogger(debug bool, logPath string) error {
 	}
 
 	if noLogs {
-		config.OutputPaths = []string{"stdout"}
+		config.OutputPaths = []string{"stderr"}
 		config.ErrorOutputPaths = []string{"stderr"}
 	} else {
 		config.OutputPaths = []string{logPath}

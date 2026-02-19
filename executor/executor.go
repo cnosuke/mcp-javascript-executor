@@ -166,22 +166,21 @@ func processResult(value goja.Value, executionTime float64) *ExecutionResponse {
 	var resultString string
 
 	switch v := exported.(type) {
-	case int64, float64:
+	case int64:
 		resultType = "number"
-		if fv, ok := v.(float64); ok {
-			switch {
-			case math.IsNaN(fv):
-				resultString = "NaN"
-			case math.IsInf(fv, 1):
-				resultString = "Infinity"
-			case math.IsInf(fv, -1):
-				resultString = "-Infinity"
-			case fv == float64(int64(fv)):
-				resultString = fmt.Sprintf("%v", int64(fv))
-			default:
-				resultString = fmt.Sprintf("%v", fv)
-			}
-		} else {
+		resultString = fmt.Sprintf("%v", v)
+	case float64:
+		resultType = "number"
+		switch {
+		case math.IsNaN(v):
+			resultString = "NaN"
+		case math.IsInf(v, 1):
+			resultString = "Infinity"
+		case math.IsInf(v, -1):
+			resultString = "-Infinity"
+		case v == float64(int64(v)):
+			resultString = fmt.Sprintf("%v", int64(v))
+		default:
 			resultString = fmt.Sprintf("%v", v)
 		}
 	case string:
@@ -301,7 +300,8 @@ func handleExecutionError(err error) *ErrorResponse {
 func marshalErrorResponse(resp *ErrorResponse) (string, error) {
 	jsonBytes, err := json.Marshal(resp)
 	if err != nil {
-		return fmt.Sprintf(`{"success":false,"error":{"type":"UnknownError","message":"%s"}}`, err.Error()), nil
+		msg, _ := json.Marshal(err.Error())
+		return fmt.Sprintf(`{"success":false,"error":{"type":"UnknownError","message":%s}}`, msg), nil
 	}
 	return string(jsonBytes), nil
 }
